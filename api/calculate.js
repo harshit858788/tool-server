@@ -44,7 +44,7 @@ const TOOLS = {
   // ── Add more tools here as you build them ──────────────────────────────────
 };
 
-export default function handler(req, res) {
+module.exports = function handler(req, res) {
   // Allow ElevenLabs to call this endpoint
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
