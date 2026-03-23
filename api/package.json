@@ -1,0 +1,5 @@
+{
+  "name": "tool-server",
+  "version": "1.0.0",
+  "description": "Formula Tool webhook server for ElevenLabs"
+}
