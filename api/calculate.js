@@ -24,17 +24,29 @@ module.exports = function handler(req, res) {
       Object.entries(inputs).map(([k, v]) => [k, isNaN(v) ? v : parseFloat(v)])
     );
 
+    // Sanitize formula — replace double quotes with single quotes
+    // so it works whether sent from ElevenLabs, Postman, or the Framework
+    const safeFormula = formula.replace(/"/g, "'");
+
     // Dynamically run the formula with the inputs as variables
     const argNames = Object.keys(parsed);
     const argValues = Object.values(parsed);
-    const fn = new Function(...argNames, `"use strict"; ${formula}`);
+    const fn = new Function(...argNames, `"use strict"; ${safeFormula}`);
     const result = fn(...argValues);
 
     if (!result || typeof result !== "object") {
       return res.status(400).json({ error: "Formula must return an object." });
     }
 
-    return res.status(200).json(result);
+    // Round all numeric values to nearest integer
+    const rounded = Object.fromEntries(
+      Object.entries(result).map(([k, v]) => {
+        const num = parseFloat(v);
+        return [k, !isNaN(num) ? Math.round(num).toLocaleString("en-IN") : v];
+      })
+    );
+
+    return res.status(200).json(rounded);
 
   } catch (err) {
     return res.status(500).json({ error: "Calculation error: " + err.message });
